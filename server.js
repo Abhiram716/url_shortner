@@ -1,9 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const ShortUrl = require("./models/shortUrl");
 const cors = require("cors");
-const shortUrl = require("./models/shortUrl");
-
+const ShortUrl = require("./models/shortUrl");
 const app = express();
 
 mongoose.connect("mongodb://localhost/urlShortener", {
@@ -16,13 +14,24 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
-app.use(express.urlencoded({ extended: false }));
 
-app.post("/shortUrls", async(req, res) => {
-  await shortUrl.create({ full: req.body.url })
-  res.redirect('/');
+// for parsing application/json
+app.use(express.json());
+
+// for parsing application/xwww-
+app.use(express.urlencoded({ extended: true }));
+//form-urlencoded
+
+app.get("/", async(req, res) => {
+  let shortUrls = await shortUrl.find();
+  res.send(shortUrls);
 });
 
-app.get("/", (req,res) => { res.send("request sucess") })
+app.post("/shortUrls",  async (req, res) => {
+  await ShortUrl.create({ full: req.body.url });
+  console.log(req.body.url)
+  res.send("req send succesfully");
+  res.redirect("/");
+});
 
 app.listen(5000);

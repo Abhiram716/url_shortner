@@ -13,23 +13,27 @@ import "./App.css";
 
 const engine = new Styletron();
 function App() {
-  let url = "http://127.0.0.1:5000/shortUrls";
-
+  let BaseUrl = "http://127.0.0.1:5000";
   const formik = useFormik({
     initialValues: {
       url: "",
     },
     onSubmit: () => {
-      // alert(JSON.stringify(values, null, 2));
-      axios(url, {
-        method: "POST",
-        url: formik.initialValues.url,
-      })
-        .then((response) => console.log(response.data))
-        .catch((error) => {
-          throw error;
-        });
-      console.log("clicked");
+      console.log("-------POST--------");
+      axios.post(
+        `${BaseUrl}/shortUrls`,
+        {
+          url: formik.values.url,
+        },
+        {
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+      console.log("------GET-----");
+      let response = axios.get(`${BaseUrl}/`);
+      console.log(typeof response);
     },
   });
 
@@ -46,18 +50,19 @@ function App() {
             <HeadingLarge>URL Shrinker</HeadingLarge>
           </Block>
           <Block>
-            <Input
-              name="url"
-              required
-              placeholder="www.example.com"
-              onChange={() => formik.handleChange}
-              onBlur={() => formik.handleBlur}
-            />
-          </Block>
-          <Block marginTop={"scale600"}>
-            <Button type="submit" onClick={() => formik.handleSubmit()}>
-              post
-            </Button>
+            <form onSubmit={formik.handleSubmit}>
+              <Input
+                autoComplete="off"
+                name="url"
+                onChange={formik.handleChange}
+                placeholder="www.example.com"
+                required
+                value={formik.values.url}
+              />
+              <Block marginTop={"scale600"}>
+                <Button type="submit">post</Button>
+              </Block>
+            </form>
           </Block>
           <Block marginTop={"scale1200"}>
             <Table
