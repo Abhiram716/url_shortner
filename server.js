@@ -23,14 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 //form-urlencoded
 
 app.get("/", async(req, res) => {
-  let shortUrls = await shortUrl.find();
+  let shortUrls = await ShortUrl.find();
   res.send(shortUrls);
 });
 
 app.post("/shortUrls",  async (req, res) => {
   await ShortUrl.create({ full: req.body.url });
   console.log(req.body.url)
-  res.send("req send succesfully");
   res.redirect("/");
 });
 

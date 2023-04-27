@@ -6,20 +6,20 @@ import { Input } from "baseui/input";
 import { SIZE, Table } from "baseui/table-semantic";
 import { HeadingLarge } from "baseui/typography";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { Client as Styletron } from "styletron-engine-atomic";
 import { Provider as StyletronProvider } from "styletron-react";
 import "./App.css";
 
 const engine = new Styletron();
 function App() {
+  let urlData = [];
   let BaseUrl = "http://127.0.0.1:5000";
   const formik = useFormik({
     initialValues: {
       url: "",
     },
     onSubmit: () => {
-      console.log("-------POST--------");
       axios.post(
         `${BaseUrl}/shortUrls`,
         {
@@ -31,12 +31,24 @@ function App() {
           },
         }
       );
-      console.log("------GET-----");
-      let response = axios.get(`${BaseUrl}/`);
-      console.log(typeof response);
+      axios.get(`${BaseUrl}/`).then((res) => {
+        for (let i = 0; i < res.data.length; i++) {
+          let tempData = res.data[i];
+          urlData.push(tempData.full, tempData.short, tempData.clicks);
+        }
+      });
     },
   });
-
+  useEffect(() => {
+    axios.get(`${BaseUrl}/`).then((res) => {
+      console.log(res.data)
+      for (let i = 0; i < res.data.length; i++) {
+        let tempData = res.data[i];
+        urlData.push(tempData.full, tempData.short, tempData.clicks);
+      }
+      console.log(urlData)
+    });
+  },[])
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
@@ -67,10 +79,7 @@ function App() {
           <Block marginTop={"scale1200"}>
             <Table
               columns={["FullUrl", "ShortUrl", "Clicks"]}
-              data={[
-                ["www.verylongURrrrrrl.com", "123456", "100 "],
-                ["www.verylongURrrrrrl.com", "123456", "100 "],
-              ]}
+              data={[urlData]}
               size={SIZE.compact}
             />
           </Block>
